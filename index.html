@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>レポート提出PDFメーカー｜写真を大学レポート用PDFに変換</title>
+<meta name="description" content="スマホ写真を選ぶだけで、大学レポート提出用のPDFをブラウザ内で作成。学籍番号・氏名・科目名・日付つきのファイル名テンプレート、ページ順並び替え、A4余白調整に対応。">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="レポート提出PDFメーカー">
+<meta property="og:description" content="写真を選ぶだけ。学籍番号・氏名・科目名つきの提出用PDFを10秒で作成。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#111318">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"SoftwareApplication",
+  "name":"レポート提出PDFメーカー",
+  "applicationCategory":"UtilitiesApplication",
+  "operatingSystem":"Web",
+  "description":"写真を大学レポート提出用PDFに変換するブラウザアプリ。ファイル名テンプレート、ページ順並び替え、A4余白調整に対応。",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}
+}
+</script>
+<style>
+:root{
+  --ink:#111318;--paper:#f7f6f2;--card:#fff;--muted:#69707d;--border:#e2e1dc;
+  --accent:#2563eb;--accent2:#1d4ed8;--green:#16a34a;--danger:#dc2626;--soft:#eff6ff;
+  --radius:14px;--shadow:0 8px 30px rgba(17,19,24,.08)
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;line-height:1.7}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+header{position:sticky;top:0;z-index:20;background:rgba(17,19,24,.96);backdrop-filter:blur(10px);color:#fff}
+.nav{max-width:1080px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-weight:800;letter-spacing:-.02em}.logo span{color:#60a5fa}
+.navlinks{display:flex;gap:14px;align-items:center;font-size:13px}.navlinks a{color:#d1d5db}
+.btn-small{background:#fff;color:var(--ink)!important;border-radius:999px;padding:7px 12px;font-weight:700}
+.hero{max-width:1080px;margin:0 auto;padding:54px 16px 28px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:28px;align-items:center}
+@media(max-width:860px){.hero{grid-template-columns:1fr;padding-top:34px}.navlinks a:not(.btn-small){display:none}}
+.kicker{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);background:#fff;border-radius:999px;padding:6px 11px;font-size:13px;color:var(--muted)}
+h1{font-size:clamp(31px,5vw,56px);line-height:1.12;margin:18px 0 14px;letter-spacing:-.05em}
+.lead{font-size:clamp(16px,2vw,19px);color:#4b5563;margin:0 0 22px}
+.ctas{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
+.btn{border:none;border-radius:12px;padding:13px 17px;font-weight:800;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.primary{background:var(--accent);color:#fff}.primary:hover{background:var(--accent2)}
+.secondary{background:#fff;border:1px solid var(--border);color:var(--ink)}
+.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px}
+.trust div{background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:12px;color:var(--muted)}
+.app-shell{background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+.app-top{background:var(--ink);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.app-body{padding:18px}
+.container{max-width:980px;margin:0 auto;padding:24px 16px 80px}
+.section-title{font-size:28px;letter-spacing:-.04em;margin:34px 0 8px}
+.section-sub{color:var(--muted);margin-top:0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:18px}
+.card-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.step-badge{background:var(--accent);color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px}
+.template-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.template-grid{grid-template-columns:1fr}.hero .app-shell{display:none}}
+.field-group{display:flex;flex-direction:column;gap:6px}.field-group.full{grid-column:1/-1}
+label{font-size:12px;font-weight:700;color:var(--muted)}
+input,select{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:15px;background:#fbfaf7;color:var(--ink);outline:none}
+input:focus,select:focus{border-color:var(--accent);background:#fff}
+.filename-preview{margin-top:12px;background:#fbfaf7;border:1px dashed var(--border);border-radius:10px;padding:11px 13px;font-size:13px;color:var(--muted);word-break:break-all}
+.filename-preview strong{color:var(--ink);font-weight:700}
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:38px 18px;text-align:center;cursor:pointer;transition:.15s;position:relative;background:#fff}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:var(--soft)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:38px;margin-bottom:8px}.upload-label{font-size:16px;font-weight:800}.upload-hint{font-size:13px;color:var(--muted)}
+.warn{margin-top:12px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:10px 12px;font-size:13px;display:none}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(142px,1fr));gap:12px;margin-top:16px}
+.photo-item{border:2px solid var(--border);border-radius:12px;overflow:hidden;background:#fff;transition:.15s;user-select:none}
+.photo-item.dragging{opacity:.45}.photo-item.drag-over-target{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+.photo-img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#f3f4f6}
+.photo-footer{padding:8px;display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center}
+.page-num{font-size:12px;font-weight:800;color:var(--accent)}
+.icon-btn{border:1px solid var(--border);background:#fff;border-radius:8px;cursor:pointer;font-size:13px;line-height:1;padding:7px}
+.icon-btn:hover{border-color:var(--accent)}.del-btn:hover{border-color:var(--danger);color:var(--danger)}
+.settings-row{display:flex;gap:12px;flex-wrap:wrap}.settings-row .field-group{flex:1;min-width:150px}
+.generate-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:16px;font-size:17px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.generate-btn:hover{background:var(--accent2)}.generate-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed}
+.utility-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.notice{font-size:13px;color:var(--muted);margin:10px 0 0}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0 32px}
+@media(max-width:760px){.features{grid-template-columns:1fr}}
+.feature{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.feature b{display:block;margin-bottom:5px}.feature p{margin:0;color:var(--muted);font-size:14px}
+.faq{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.faq{grid-template-columns:1fr}}
+.faq details{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:15px}
+.faq summary{font-weight:800;cursor:pointer}.faq p{color:var(--muted);font-size:14px;margin-bottom:0}
+.footer{background:#111318;color:#d1d5db;margin-top:40px;padding:32px 16px;font-size:13px}.footer-inner{max-width:1080px;margin:0 auto}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;transition:.28s;z-index:99;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}.toast.success{background:var(--green)}
+</style>
+</head>
+<body>
+<header>
+  <nav class="nav">
+    <div class="logo">レポート提出<span>PDF</span>メーカー</div>
+    <div class="navlinks">
+      <a href="#tool">PDFを作る</a>
+      <a href="#features">特徴</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn-small" href="#tool">無料で使う</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div>
+    <div class="kicker">✅ インストール不要 · ✅ 画像はブラウザ内で処理 · ✅ 大学レポート提出向け</div>
+    <h1>写真を選ぶだけ。提出用PDFをすぐ作成。</h1>
+    <p class="lead">学籍番号・氏名・科目名・日付つきのファイル名を自動生成。スマホで撮った手書きレポートや実験ノートを、A4のPDFにまとめられます。</p>
+    <div class="ctas">
+      <a class="btn primary" href="#tool">📄 今すぐPDFを作る</a>
+      <button class="btn secondary" id="share-btn" type="button">🔗 友達に共有</button>
+    </div>
+    <div class="trust">
+      <div>画像アップロード先サーバーなし</div>
+      <div>ページ順をスマホでも変更</div>
+      <div>提出ファイル名ミスを減らす</div>
+    </div>
+  </div>
+  <div class="app-shell" aria-hidden="true">
+    <div class="app-top"><b>レポPDF</b><span>写真 → PDF</span></div>
+    <div class="app-body">
+      <div class="filename-preview">📄 <strong>物理学実験_24B00000_山田太郎_20260610.pdf</strong></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px">
+        <div style="height:150px;border-radius:12px;background:#e5e7eb;display:grid;place-items:center">P.1</div>
+        <div style="height:150px;border-radius:12px;background:#dbeafe;display:grid;place-items:center">P.2</div>
+        <div style="height:150px;border-radius:12px;background:#e5e7eb;display:grid;place-items:center">P.3</div>
+      </div>
+      <button class="generate-btn" style="margin-top:14px">PDFを生成</button>
+    </div>
+  </div>
+</section>
+
+<main class="container">
+  <section id="tool">
+    <h2 class="section-title">PDFを作る</h2>
+    <p class="section-sub">写真はこのブラウザ内で処理されます。外部の変換サーバーには送信しません。</p>
+
+    <div class="card">
+      <div class="card-title"><span class="step-badge">01</span>ファイル名テンプレート</div>
+      <div class="template-grid">
+        <div class="field-group">
+          <label for="tpl-name">氏名</label>
+          <input type="text" id="tpl-name" placeholder="山田太郎" autocomplete="name">
+        </div>
+        <div class="field-group">
+          <label for="tpl-id">学籍番号</label>
+          <input type="text" id="tpl-id" placeholder="24B00000" autocomplete="off">
+        </div>
+        <div class="field-group">
+          <label for="tpl-subject">科目名</label>
+          <input type="text" id="tpl-subject" placeholder="情報処理概論">
+        </div>
+        <div class="field-group">
+          <label for="tpl-date">提出日</label>
+          <input type="date" id="tpl-date">
+        </div>
+        <div class="field-group full">
+          <label for="tpl-pattern">ファイル名パターン</label>
+          <select id="tpl-pattern">
+            <option value="{subject}_{id}_{name}_{date}">科目名_学籍番号_氏名_日付</option>
+            <option value="{subject}_{name}_{date}">科目名_氏名_日付</option>
+            <option value="{id}_{subject}_{date}">学籍番号_科目名_日付</option>
+            <option value="{name}_{id}_{subject}_{date}">氏名_学籍番号_科目名_日付</option>
+            <option value="{subject}_レポート_{date}">科目名_レポート_日付</option>
+          </select>
+        </div>
+      </div>
+      <div class="filename-preview">📄 <strong id="filename-output">科目名_学籍番号_氏名_YYYYMMDD.pdf</strong></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="step-badge">02</span>写真を追加</div>
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="file-input" accept="image/*,.heic,.heif" multiple>
+        <div class="upload-icon">📷</div>
+        <div class="upload-label">写真をドロップ、またはタップして選択</div>
+        <div class="upload-hint">JPG・PNG・WebP 推奨。複数枚まとめて選択できます。</div>
+      </div>
+      <div id="heic-warn" class="warn">HEIC/HEIF画像はブラウザによって扱えない場合があります。うまく表示されないときは、iPhoneの「互換性優先」で撮影するか、JPEGに変換してから使ってください。</div>
+      <div class="photo-grid" id="photo-grid"></div>
+      <p class="notice" id="drag-hint" style="display:none">スマホでは「↑」「↓」で順番変更、PCではドラッグでも変更できます。</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="step-badge">03</span>PDF設定</div>
+      <div class="settings-row">
+        <div class="field-group">
+          <label for="pdf-size">用紙サイズ</label>
+          <select id="pdf-size">
+            <option value="a4">A4（レポート標準）</option>
+            <option value="a3">A3</option>
+            <option value="letter">Letter</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="pdf-margin">余白</label>
+          <select id="pdf-margin">
+            <option value="20">標準（20mm）</option>
+            <option value="15">小（15mm）</option>
+            <option value="25">大（25mm）</option>
+            <option value="0">なし</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="pdf-quality">画質</label>
+          <select id="pdf-quality">
+            <option value="0.92">高画質（提出向け）</option>
+            <option value="0.75">標準</option>
+            <option value="0.55">軽量（メール向け）</option>
+          </select>
+        </div>
+      </div>
+      <div class="utility-row">
+        <button class="btn secondary" type="button" id="save-preset-btn">💾 入力内容を保存</button>
+        <button class="btn secondary" type="button" id="clear-preset-btn">🧹 保存内容を消す</button>
+      </div>
+      <p class="notice">保存内容はこの端末のブラウザだけに残ります。画像そのものは保存しません。</p>
+    </div>
+
+    <button class="generate-btn" id="gen-btn" type="button" disabled>📄 PDFを生成してダウンロード</button>
+  </section>
+
+  <section id="features">
+    <h2 class="section-title">特徴</h2>
+    <div class="features">
+      <div class="feature"><b>提出ファイル名に特化</b><p>氏名、学籍番号、科目名、日付をもとに、提出用のファイル名を自動生成します。</p></div>
+      <div class="feature"><b>スマホでも順番変更</b><p>ドラッグ操作が苦手な環境でも、上下ボタンでページ順を変えられます。</p></div>
+      <div class="feature"><b>ブラウザ内でPDF化</b><p>画像データは変換サーバーへ送らず、手元のブラウザでPDFを作成します。</p></div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <h2 class="section-title">FAQ</h2>
+    <div class="faq">
+      <details open><summary>画像はサーバーに送られますか？</summary><p>PDF化処理はブラウザ内で行われます。ただし、このページ自体の配信、CDN、広告、アクセス解析などを入れた場合は、それらの外部通信は発生します。</p></details>
+      <details><summary>大学の提出に使えますか？</summary><p>A4・余白ありのPDFを作れます。ただし、授業ごとに指定形式がある場合は、提出前に必ず確認してください。</p></details>
+      <details><summary>HEICの写真は使えますか？</summary><p>環境によって扱える場合と扱えない場合があります。安定運用するなら、JPGまたはPNGを推奨します。</p></details>
+      <details><summary>無料ですか？</summary><p>この版は無料で使えます。将来的にテンプレート保存強化、表紙生成、PDF結合、傾き補正などをPro機能にする余地があります。</p></details>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <b>レポート提出PDFメーカー</b>
+    <p>写真を大学レポート提出用PDFに変換するブラウザツール。要望があれば、回転補正、影除去、表紙生成、PDF結合などを追加予定です。</p>
+    <p>© <span id="year"></span> Report PDF Maker</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let photos = [];
+let dragSrcIndex = null;
+
+const $ = id => document.getElementById(id);
+
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date();
+  $('tpl-date').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  $('year').textContent = today.getFullYear();
+
+  restorePreset();
+  updatePreview();
+
+  ['tpl-name','tpl-id','tpl-subject','tpl-date','tpl-pattern'].forEach(id => $(id).addEventListener('input', updatePreview));
+  $('file-input').addEventListener('change', e => { handleFiles(e.target.files); e.target.value = ''; });
+  $('gen-btn').addEventListener('click', generatePDF);
+  $('save-preset-btn').addEventListener('click', savePreset);
+  $('clear-preset-btn').addEventListener('click', clearPreset);
+  $('share-btn').addEventListener('click', shareSite);
+
+  const zone = $('upload-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files);
+  });
+});
+
+function sanitizePart(s, fallback){
+  const value = (s || '').trim() || fallback;
+  return value.replace(/[\\/:*?"<>|#%{}$!'@+`=]/g, '').replace(/\s+/g, '_').slice(0, 60);
+}
+
+function buildFilename(){
+  const name = sanitizePart($('tpl-name').value, '氏名');
+  const sid = sanitizePart($('tpl-id').value, '学籍番号');
+  const subject = sanitizePart($('tpl-subject').value, '科目名');
+  const rawDate = $('tpl-date').value;
+  const date = rawDate ? rawDate.replace(/-/g, '') : 'YYYYMMDD';
+  const pattern = $('tpl-pattern').value;
+  return pattern.replace('{name}', name).replace('{id}', sid).replace('{subject}', subject).replace('{date}', date);
+}
+
+function updatePreview(){
+  $('filename-output').textContent = buildFilename() + '.pdf';
+}
+
+function handleFiles(fileList){
+  const files = Array.from(fileList);
+  if(!files.length) return;
+
+  files.forEach(file => {
+    const ext = file.name.toLowerCase().split('.').pop();
+    if(['heic','heif'].includes(ext) || /heic|heif/i.test(file.type)){
+      $('heic-warn').style.display = 'block';
+    }
+    if(!file.type.startsWith('image/') && !['heic','heif'].includes(ext)){
+      showToast('画像ファイルだけ追加できます', false);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      photos.push({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random()), dataURL:e.target.result, file, rotation:0 });
+      renderGrid();
+    };
+    reader.onerror = () => showToast('画像を読み込めませんでした', false);
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderGrid(){
+  const grid = $('photo-grid');
+  grid.innerHTML = '';
+  $('drag-hint').style.display = photos.length ? 'block' : 'none';
+  $('gen-btn').disabled = photos.length === 0;
+
+  photos.forEach((photo, i) => {
+    const item = document.createElement('div');
+    item.className = 'photo-item';
+    item.draggable = true;
+    item.dataset.index = i;
+
+    const img = document.createElement('img');
+    img.className = 'photo-img';
+    img.src = photo.dataURL;
+    img.style.transform = `rotate(${photo.rotation}deg)`;
+    img.alt = `PDF ${i+1}ページ目の画像`;
+
+    const footer = document.createElement('div');
+    footer.className = 'photo-footer';
+
+    const num = document.createElement('span');
+    num.className = 'page-num';
+    num.textContent = `P.${i+1}`;
+
+    const up = iconButton('↑', '前のページへ', () => movePhoto(i, i-1), i === 0);
+    const down = iconButton('↓', '次のページへ', () => movePhoto(i, i+1), i === photos.length-1);
+    const rotate = iconButton('⟳', '90度回転', () => { photos[i].rotation = (photos[i].rotation + 90) % 360; renderGrid(); });
+    const del = iconButton('×', '削除', () => { photos.splice(i,1); renderGrid(); }, false, 'del-btn');
+
+    footer.append(num, up, down, rotate, del);
+    item.append(img, footer);
+
+    item.addEventListener('dragstart', () => { dragSrcIndex = i; setTimeout(()=>item.classList.add('dragging'), 0); });
+    item.addEventListener('dragend', () => item.classList.remove('dragging'));
+    item.addEventListener('dragover', e => { e.preventDefault(); item.classList.add('drag-over-target'); });
+    item.addEventListener('dragleave', () => item.classList.remove('drag-over-target'));
+    item.addEventListener('drop', e => {
+      e.preventDefault(); item.classList.remove('drag-over-target');
+      const targetIndex = Number(item.dataset.index);
+      if(dragSrcIndex === null || dragSrcIndex === targetIndex) return;
+      movePhoto(dragSrcIndex, targetIndex);
+      dragSrcIndex = null;
+    });
+
+    grid.appendChild(item);
+  });
+}
+
+function iconButton(text, title, onClick, disabled=false, extra=''){
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = `icon-btn ${extra}`;
+  btn.textContent = text;
+  btn.title = title;
+  btn.disabled = disabled;
+  btn.onclick = e => { e.stopPropagation(); if(!disabled) onClick(); };
+  return btn;
+}
+
+function movePhoto(from, to){
+  if(to < 0 || to >= photos.length) return;
+  const [moved] = photos.splice(from, 1);
+  photos.splice(to, 0, moved);
+  renderGrid();
+}
+
+async function generatePDF(){
+  if(!photos.length){ showToast('写真を追加してください', false); return; }
+  if(!window.jspdf){ showToast('PDFライブラリの読み込みに失敗しました。通信環境を確認してください。', false); return; }
+
+  const btn = $('gen-btn');
+  btn.disabled = true; btn.textContent = '⏳ 生成中...';
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const size = $('pdf-size').value;
+    const margin = parseInt($('pdf-margin').value, 10);
+    const quality = parseFloat($('pdf-quality').value);
+    const sizes = { a4:[210,297], a3:[297,420], letter:[215.9,279.4] };
+    const [pw, ph] = sizes[size] || sizes.a4;
+    const doc = new jsPDF({ unit:'mm', format:size, compress:true });
+
+    for(let i=0; i<photos.length; i++){
+      if(i>0) doc.addPage();
+      const prepared = await prepareImage(photos[i].dataURL, photos[i].rotation, quality);
+      const img = await loadImage(prepared);
+      const imgW = img.naturalWidth, imgH = img.naturalHeight;
+      const maxW = pw - margin * 2, maxH = ph - margin * 2;
+      const ratio = Math.min(maxW / imgW, maxH / imgH);
+      const drawW = imgW * ratio, drawH = imgH * ratio;
+      const x = margin + (maxW - drawW) / 2;
+      const y = margin + (maxH - drawH) / 2;
+      doc.addImage(prepared, 'JPEG', x, y, drawW, drawH, undefined, 'MEDIUM', 0);
+    }
+
+    const filename = buildFilename();
+    doc.save(filename + '.pdf');
+
+    const count = Number(localStorage.getItem('reportPdfGeneratedCount') || '0') + 1;
+    localStorage.setItem('reportPdfGeneratedCount', String(count));
+    showToast(`✅ ${filename}.pdf を保存しました`, true);
+  } catch(err) {
+    console.error(err);
+    showToast('PDF生成に失敗しました。画像形式や枚数を減らして試してください。', false);
+  } finally {
+    btn.disabled = false; btn.innerHTML = '📄 PDFを生成してダウンロード';
+  }
+}
+
+function loadImage(src){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+async function prepareImage(dataURL, rotation, quality){
+  const img = await loadImage(dataURL);
+  const canvas = document.createElement('canvas');
+  const rot = ((rotation % 360) + 360) % 360;
+  const swap = rot === 90 || rot === 270;
+  canvas.width = swap ? img.naturalHeight : img.naturalWidth;
+  canvas.height = swap ? img.naturalWidth : img.naturalHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.save();
+  if(rot === 90){ ctx.translate(canvas.width, 0); ctx.rotate(Math.PI/2); }
+  else if(rot === 180){ ctx.translate(canvas.width, canvas.height); ctx.rotate(Math.PI); }
+  else if(rot === 270){ ctx.translate(0, canvas.height); ctx.rotate(3*Math.PI/2); }
+  ctx.drawImage(img, 0, 0);
+  ctx.restore();
+  return canvas.toDataURL('image/jpeg', quality);
+}
+
+function savePreset(){
+  const preset = {
+    name:$('tpl-name').value, id:$('tpl-id').value, subject:$('tpl-subject').value,
+    pattern:$('tpl-pattern').value, size:$('pdf-size').value, margin:$('pdf-margin').value, quality:$('pdf-quality').value
+  };
+  localStorage.setItem('reportPdfPreset', JSON.stringify(preset));
+  showToast('入力内容を保存しました', true);
+}
+
+function restorePreset(){
+  try{
+    const preset = JSON.parse(localStorage.getItem('reportPdfPreset') || '{}');
+    if(preset.name) $('tpl-name').value = preset.name;
+    if(preset.id) $('tpl-id').value = preset.id;
+    if(preset.subject) $('tpl-subject').value = preset.subject;
+    if(preset.pattern) $('tpl-pattern').value = preset.pattern;
+    if(preset.size) $('pdf-size').value = preset.size;
+    if(preset.margin) $('pdf-margin').value = preset.margin;
+    if(preset.quality) $('pdf-quality').value = preset.quality;
+  } catch(e){}
+}
+
+function clearPreset(){
+  localStorage.removeItem('reportPdfPreset');
+  showToast('保存内容を削除しました', true);
+}
+
+async function shareSite(){
+  const text = '写真から大学レポート提出用PDFを作れるツール';
+  try{
+    if(navigator.share){ await navigator.share({ title:document.title, text, url:location.href }); }
+    else { await navigator.clipboard.writeText(location.href); showToast('URLをコピーしました', true); }
+  }catch(e){}
+}
+
+function showToast(msg, success=true){
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (success ? ' success' : '');
+  void t.offsetWidth;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
