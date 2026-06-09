@@ -441,6 +441,14 @@ async function generatePDF(){
 
     const filename = buildFilename();
     doc.save(filename + '.pdf');
+    if (typeof gtag === 'function') {
+  gtag('event', 'generate_pdf', {
+    page_count: photos.length,
+    paper_size: size,
+    margin_mm: margin,
+    quality: quality
+  });
+}
 
     const count = Number(localStorage.getItem('reportPdfGeneratedCount') || '0') + 1;
     localStorage.setItem('reportPdfGeneratedCount', String(count));
